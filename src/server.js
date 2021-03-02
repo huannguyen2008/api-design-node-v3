@@ -12,16 +12,22 @@ app.use(json())
 app.use(urlencoded({ extended: true }))
 app.use(morgan('dev'))
 
-app.get('/', (req, res) => {
-    res.send({ message: 'hello' })
+const logSomething = async function (req, res, next) {
+    console.log('dau 1 lan` la finish')
+    req.myData = 'definitely xao lao'
+    next()
+}
+
+app.get('/data', [logSomething, logSomething, logSomething], async function (req, res) {
+    res.send({ data: req.myData })
 })
 
-app.post('/', (req, res) => {
-    console.log(req.body);
-    res.send({ message: 'ok' })
+app.post('/', async function (req, res) {
+    console.log(req.body)
+    res.send(req.body)
 })
-export const start = () => { 
-    app.listen(3100,() =>{
-        console.log("go go on 3100");
-    } )
+export const start = () => {
+    app.listen(3100, () => {
+        console.log("go go on 3100")
+    })
 }
