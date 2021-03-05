@@ -16,10 +16,42 @@ export const verifyToken = token =>
     })
   })
 
-export const signup = async (req, res) => {}
+export const signup = async (req, res) => {
+  if (!req.body.email || !req.body.password) {
+    return res.status(400).send({ message: 'required email and pw' })
+  }
+  try {
+    const user = await User.create(req.body)
+    const token = newToken(user)
+    return res.status(201).send({ token })
+  } catch (e) {
+    console.error(e)
+    return res.status(400).end()
+  }
+}
 
-export const signin = async (req, res) => {}
+export const signin = async (req, res) => {
+  if (!req.body.email || !req.body.password) {
+    return res.status(400).send({ message: 'required email and pw' })
+  }
+  try {
+    const user = await User.findOne({ email: req.body.email }).exec()
+    if (!user) {
+      return res.status(401).send({ message: 'not an user' })
+    }
+    const correctPw = await user.checkPassword(req.body.password)
+    if (!correctPw) {
+      return res.status(401).send({ message: 'wrong pw' })
+    }
+    const token = newToken(user)
+    return res.status(201).send({ token })
+  } catch (e) {
+    console.error(e)
+    return res.status(400).end()
+  }
+}
 
 export const protect = async (req, res, next) => {
+
   next()
 }
